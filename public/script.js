@@ -10,9 +10,9 @@ let makeDictionary = function () {
         dictionary = JSON.parse(request.responseText);
     });
 };
-makeDictionary();
-window.addEventListener("load", function () {
 
+window.addEventListener("load", function () {
+    makeDictionary();
     const limitQuestions = 3;
     let currentQuestion = 0;
     let currentLetter = 0;
@@ -24,6 +24,7 @@ window.addEventListener("load", function () {
     let letters = document.querySelector("#letters");
     let currentQuestionElem = document.querySelector("#current_question");
     let totalQuestionsElem = document.querySelector("#total_questions");
+    let getErrorsBtn = document.querySelector("#getErrors");
 
     totalQuestionsElem.innerHTML = limitQuestions;
 
@@ -42,9 +43,7 @@ window.addEventListener("load", function () {
 
     let displayCurrentQuestion = function () {
         const URL = `http://127.0.0.1:3000/words`;
-
         let request = new XMLHttpRequest();
-
         request.open("GET",URL);
         request.send();
         request.addEventListener("load",function () {
@@ -59,6 +58,14 @@ window.addEventListener("load", function () {
             currentQuestionElem.innerHTML = currentQuestion + 1;
             answerContainer.innerHTML = "";
         });
+    };
+
+    let saveStatistics = () => {
+        const req = new XMLHttpRequest();
+        req.open("POST", "http://127.0.0.1:3000/save?errors=" + mistakes);
+        req.send();
+        req.onload = () => console.log("Успешно сохранена статистика на сервере!");
+        req.onerror = () => console.log("Ошибка при отправке запроса на сохранение");
     };
 
     displayCurrentQuestion();
@@ -95,6 +102,8 @@ window.addEventListener("load", function () {
                     if (currentQuestion >= limitQuestions) {
                         letters.innerHTML = "<div class='alert alert-success'>Вы успешно справились со всеми заданиями!" +
                             "<button id='reload' class=\"btn btn-sm mr-1 btn-success\">Начать сначала</button></div>";
+
+                        saveStatistics();
                     } else {
                         makeCurrentQuestion();
                         displayCurrentQuestion();
@@ -113,6 +122,20 @@ window.addEventListener("load", function () {
                 }, 300);
             }
         }
+    });
+    getErrorsBtn.addEventListener("click", function () {
+        const req = new XMLHttpRequest();
+        req.open("GET",  "http://127.0.0.1:3000/stat");
+
+        req.onload = () => {
+            if (req.status === 200) {
+                alert("Всего ошибок у всех пользователей: " + req.responseText);
+            } else {
+                alert("Не удалось получить статистику!");
+            }
+        };
+
+        req.send();
     });
 });
 

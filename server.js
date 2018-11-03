@@ -1,7 +1,8 @@
 const express = require("express");
-// const fs =require("fs");
+const fs = require("fs");
 const app = express();
 const port = 3000;
+const statLocation = __dirname + "/errors-stat.txt";
 let currentQuestion = 0;
 let limitQuestions = 0;
 let dictionary = [
@@ -24,6 +25,27 @@ let displayCurrentQuestion = () => {
     shuffle(wordArr);
 };
 app.use(express.static(__dirname + "/public/"));
+
+let mistakes =  parseInt(fs.readFileSync(statLocation));;
+
+app.post("/save", (req, res) => {
+
+    mistakes += parseInt(req.query.errors);
+    console.log(req.query.errors);
+
+    // запись в файл
+    fs.writeFile(statLocation, mistakes, (err) => {
+        if (err) {
+            console.log("Ошибка записи в файл!");
+        }
+
+    });
+
+    res.sendStatus(200);
+});
+app.get("/stat", (req, res) => {
+    res.send(mistakes.toString());
+});
 
 app.post("/make", (req, res) => {
     currentQuestion = parseInt(req.query.currentQuestion);
