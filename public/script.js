@@ -13,6 +13,7 @@ let makeDictionary = function () {
 
 window.addEventListener("load", function () {
     makeDictionary();
+
     const limitQuestions = 3;
     let currentQuestion = 0;
     let currentLetter = 0;
@@ -28,12 +29,12 @@ window.addEventListener("load", function () {
 
     totalQuestionsElem.innerHTML = limitQuestions;
 
-    let makelimitQuestions = () => {
+    let makeLimitQuestions = () => {
         const req = new XMLHttpRequest();
         req.open("POST", "http://127.0.0.1:3000/transfer?limitQuestions=" + limitQuestions);
         req.send();
     };
-    makelimitQuestions();
+    makeLimitQuestions();
 
     let makeCurrentQuestion = () => {
         const req = new XMLHttpRequest();
@@ -59,7 +60,7 @@ window.addEventListener("load", function () {
             answerContainer.innerHTML = "";
         });
     };
-
+    
     let saveStatistics = () => {
         const req = new XMLHttpRequest();
         req.open("POST", "http://127.0.0.1:3000/save?errors=" + mistakes);
